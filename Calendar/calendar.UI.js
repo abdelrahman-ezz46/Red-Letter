@@ -1,12 +1,6 @@
 import { h, render } from "../shared/dom.js";
 import { messageForError } from "../shared/errorMessages.js";
-
-const CLASSIFICATION_LABELS = {
-  absorbed: "Absorbed into the weekend",
-  free: "Free long weekend",
-  bridge: "Bridge day",
-  midweek: "Midweek holiday",
-};
+import { CLASSIFICATION_LABELS } from "../shared/classificationLabels.js";
 
 function formatDateRange(startDate, endDate) {
   return startDate === endDate ? startDate : `${startDate} → ${endDate}`;

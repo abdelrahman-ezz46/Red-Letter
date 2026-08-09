@@ -7,6 +7,7 @@ export const ErrorCode = Object.freeze({
   HTTP_5XX: "HTTP_5XX",
   PARSE: "PARSE",
   NO_RESULTS: "NO_RESULTS",
+  STORAGE: "STORAGE",
 });
 
 export const Result = Object.freeze({

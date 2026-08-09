@@ -19,6 +19,8 @@ const MESSAGE_BUILDERS = {
     "The holiday service sent back something we couldn't read.",
   [ErrorCode.NO_RESULTS]: (context) =>
     `${context.countryName ?? "This country"} has no recorded public holidays for ${context.year ?? "this year"}. That's the real answer, not an error — try another year.`,
+  [ErrorCode.STORAGE]: () =>
+    "Your shortlist can't be saved in this browser right now. Changes will be lost when you leave this page.",
 };
 
 export function messageForError(code, context = {}) {

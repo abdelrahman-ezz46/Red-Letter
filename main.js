@@ -1,5 +1,6 @@
 import { createStore } from "./shared/store.js";
 import { initCalendarSlice } from "./Calendar/calendar.Controller.js";
+import { initShortlistSlice } from "./Shortlist/shortlist.Controller.js";
 
 const MOUNT_IDS = {
   calendar: "calendar-root",
@@ -38,6 +39,7 @@ function boot() {
 
   const store = createStore({ shortlist: [] });
 
+  initShortlistSlice(mounts.shortlist, store);
   initCalendarSlice(mounts.calendar, store);
 
   document.documentElement.dataset.appReady = "true";
