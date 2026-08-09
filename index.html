@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Red Letter — long weekend planner</title>
+    <meta
+      name="description"
+      content="Pick a country, see this year's public holidays, and find the ones worth booking time off around."
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2213%22 font-size=%2213%22>%F0%9F%93%85</text></svg>"
+    />
+  </head>
+  <body>
+    <div class="app">
+      <header class="site-header">
+        <h1 class="site-title">Red Letter</h1>
+        <p class="site-tagline">
+          Public holidays that land next to a weekend, and which ones are worth
+          booking leave around.
+        </p>
+      </header>
+
+      <main class="site-main">
+        <section
+          id="calendar-root"
+          class="slice slice-calendar"
+          aria-labelledby="calendar-heading"
+        >
+          <h2 id="calendar-heading" class="slice-heading">Holidays</h2>
+          <p class="placeholder">Pick a country to begin.</p>
+        </section>
+
+        <section
+          id="shortlist-root"
+          class="slice slice-shortlist"
+          aria-labelledby="shortlist-heading"
+        >
+          <h2 id="shortlist-heading" class="slice-heading">Shortlist</h2>
+          <p class="placeholder">Days you pick will collect here.</p>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>
+          Holiday data from
+          <a href="https://date.nager.at" rel="noopener noreferrer" target="_blank"
+            >Nager.Date</a
+          >.
+        </p>
+      </footer>
+    </div>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
