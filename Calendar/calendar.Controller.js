@@ -38,6 +38,8 @@ export function initCalendarSlice(root, store) {
 
     if (result.isSuccess) {
       store.setState({ countries: mapCountries(result.data), countriesStatus: "success" });
+    } else if (result.error.code === ErrorCode.NO_RESULTS) {
+      store.setState({ countries: [], countriesStatus: "empty", countriesError: result.error });
     } else {
       store.setState({ countriesStatus: "error", countriesError: result.error });
     }

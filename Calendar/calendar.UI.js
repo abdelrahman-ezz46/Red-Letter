@@ -58,6 +58,13 @@ function renderCountryPicker(state, handlers) {
     ]);
   }
 
+  if (state.countriesStatus === "empty") {
+    return h("div.country-picker", {}, [
+      h("p.status-empty", { role: "status" }, messageForError(state.countriesError.code, state.countriesError.context)),
+      h("button", { type: "button", onclick: handlers.onRetryCountries }, "Retry"),
+    ]);
+  }
+
   const matches = state.filteredCountries.slice(0, 40);
 
   return h("div.country-picker", {}, [

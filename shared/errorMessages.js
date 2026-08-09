@@ -17,8 +17,12 @@ const MESSAGE_BUILDERS = {
     "The holiday service is having trouble right now. Try again shortly.",
   [ErrorCode.PARSE]: () =>
     "The holiday service sent back something we couldn't read.",
-  [ErrorCode.NO_RESULTS]: (context) =>
-    `${context.countryName ?? "This country"} has no recorded public holidays for ${context.year ?? "this year"}. That's the real answer, not an error — try another year.`,
+  [ErrorCode.NO_RESULTS]: (context) => {
+    if (context.countryName) {
+      return `${context.countryName} has no recorded public holidays for ${context.year ?? "this year"}. That's the real answer, not an error — try another year.`;
+    }
+    return "No countries are available from the holiday service right now. That's the real answer, not an error — try again shortly.";
+  },
   [ErrorCode.STORAGE]: () =>
     "Your shortlist can't be saved in this browser right now. Changes will be lost when you leave this page.",
 };

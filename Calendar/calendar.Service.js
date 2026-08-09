@@ -6,7 +6,17 @@ const BASE_URL = "https://date.nager.at/api/v3";
 export async function fetchAvailableCountries() {
   const result = await safeFetch(`${BASE_URL}/AvailableCountries`);
   if (!result.isSuccess) return result;
-  return Result.success(result.data ?? []);
+
+  const countries = result.data ?? [];
+  if (countries.length === 0) {
+    return Result.failure(
+      ErrorCode.NO_RESULTS,
+      "No countries available from the holiday service.",
+      {},
+    );
+  }
+
+  return Result.success(countries);
 }
 
 export async function fetchPublicHolidays(countryCode, year) {
