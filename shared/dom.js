@@ -8,7 +8,33 @@ export function clear(node) {
   }
 }
 
+function captureFocus(node) {
+  const active = document.activeElement;
+  if (!active || !active.id || !node.contains(active)) return null;
+
+  const hasSelection = typeof active.selectionStart === "number";
+  return {
+    id: active.id,
+    selectionStart: hasSelection ? active.selectionStart : null,
+    selectionEnd: hasSelection ? active.selectionEnd : null,
+  };
+}
+
+function restoreFocus(node, captured) {
+  if (!captured) return;
+
+  const next = node.querySelector(`#${CSS.escape(captured.id)}`);
+  if (!next) return;
+
+  next.focus();
+  if (captured.selectionStart !== null && typeof next.setSelectionRange === "function") {
+    next.setSelectionRange(captured.selectionStart, captured.selectionEnd);
+  }
+}
+
 export function render(node, content) {
+  const captured = captureFocus(node);
+
   clear(node);
   if (content instanceof Node) {
     node.appendChild(content);
@@ -17,6 +43,8 @@ export function render(node, content) {
       if (item instanceof Node) node.appendChild(item);
     }
   }
+
+  restoreFocus(node, captured);
   return node;
 }
 
