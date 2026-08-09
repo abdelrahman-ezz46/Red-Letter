@@ -68,6 +68,10 @@ export function classifyWeekday(weekday) {
   return WEEKDAY_RULES[weekday].classification;
 }
 
+export function currentYear() {
+  return new Date().getUTCFullYear();
+}
+
 function isAlreadyOff(dateString, holidaySet) {
   const weekday = getWeekday(dateString);
   return weekday === Weekday.SUNDAY || weekday === Weekday.SATURDAY || holidaySet.has(dateString);
