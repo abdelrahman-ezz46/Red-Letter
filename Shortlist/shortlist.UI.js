@@ -1,10 +1,20 @@
 import { h, render } from "../shared/dom.js";
 import { messageForError } from "../shared/errorMessages.js";
 import { CLASSIFICATION_LABELS } from "../shared/classificationLabels.js";
+import { WEEKDAY_NAMES, formatDayTile, getWeekday } from "../shared/dates.js";
 import { sortShortlist, summarizeShortlist } from "./shortlist.mapper.js";
 
 function pluralDays(count) {
   return `${count} day${count === 1 ? "" : "s"}`;
+}
+
+function renderDayTile(dateString) {
+  const { day, month } = formatDayTile(dateString);
+  return h("time.day-tile", { datetime: dateString }, [
+    h("span.day-tile-month", {}, month),
+    h("span.day-tile-number", {}, day),
+    h("span.day-tile-weekday", {}, WEEKDAY_NAMES[getWeekday(dateString)].slice(0, 3)),
+  ]);
 }
 
 function renderSummary(summary) {
@@ -25,16 +35,18 @@ function renderClassificationBadge(classification) {
 }
 
 function renderItem(item, handlers) {
-  return h("li.shortlist-item", {}, [
-    h("div.holiday-heading", {}, [
-      h("span.holiday-local-name", { dir: "auto" }, item.localName),
-      item.localName !== item.name ? h("span.holiday-name", {}, `(${item.name})`) : null,
-      h("span.shortlist-country", {}, `— ${item.countryName}`),
+  return h("li.shortlist-item", { dataset: { classification: item.classification?.classification ?? "none" } }, [
+    renderDayTile(item.date),
+    h("div.holiday-body", {}, [
+      h("div.holiday-heading", {}, [
+        h("span.holiday-local-name", { dir: "auto" }, item.localName),
+        item.localName !== item.name ? h("span.holiday-name", {}, `(${item.name})`) : null,
+        h("span.shortlist-country", {}, `— ${item.countryName}`),
+      ].filter(Boolean)),
+      renderClassificationBadge(item.classification),
+      h("button.shortlist-remove", { type: "button", onclick: () => handlers.onRemove(item) }, "Remove"),
     ].filter(Boolean)),
-    h("time.holiday-date", { datetime: item.date }, item.date),
-    renderClassificationBadge(item.classification),
-    h("button.shortlist-remove", { type: "button", onclick: () => handlers.onRemove(item) }, "Remove"),
-  ].filter(Boolean));
+  ]);
 }
 
 export function renderShortlist(root, state, handlers) {

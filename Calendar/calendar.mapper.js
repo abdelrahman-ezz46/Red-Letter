@@ -1,4 +1,4 @@
-import { classifyHoliday, compareISODates } from "../shared/dates.js";
+import { classifyHoliday, compareISODates, getWeekday } from "../shared/dates.js";
 import { isValidCountryRecord, isValidHolidayRecord } from "./calendar.validation.js";
 
 export function mapCountries(rawList) {
@@ -21,6 +21,7 @@ export function filterCountries(countries, query) {
 function mapHoliday(raw) {
   return {
     date: raw.date,
+    weekday: getWeekday(raw.date),
     name: raw.name,
     localName: raw.localName,
     types: raw.types,

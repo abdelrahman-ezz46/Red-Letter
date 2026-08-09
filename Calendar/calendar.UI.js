@@ -1,9 +1,19 @@
 import { h, render } from "../shared/dom.js";
 import { messageForError } from "../shared/errorMessages.js";
 import { CLASSIFICATION_LABELS } from "../shared/classificationLabels.js";
+import { WEEKDAY_NAMES, formatDayTile } from "../shared/dates.js";
 
 function formatDateRange(startDate, endDate) {
   return startDate === endDate ? startDate : `${startDate} → ${endDate}`;
+}
+
+function renderDayTile(dateString, weekday) {
+  const { day, month } = formatDayTile(dateString);
+  return h("time.day-tile", { datetime: dateString }, [
+    h("span.day-tile-month", {}, month),
+    h("span.day-tile-number", {}, day),
+    h("span.day-tile-weekday", {}, WEEKDAY_NAMES[weekday].slice(0, 3)),
+  ]);
 }
 
 function renderClassificationBadge(classification) {
@@ -30,20 +40,22 @@ function renderRegionNote(holiday) {
 
 function renderHolidayCard(holiday, isShortlisted, handlers) {
   return h("li.holiday-card", { dataset: { classification: holiday.classification?.classification ?? "none" } }, [
-    h("div.holiday-heading", {}, [
-      h("span.holiday-local-name", { dir: "auto" }, holiday.localName),
-      holiday.localName !== holiday.name ? h("span.holiday-name", {}, `(${holiday.name})`) : null,
+    renderDayTile(holiday.date, holiday.weekday),
+    h("div.holiday-body", {}, [
+      h("div.holiday-heading", {}, [
+        h("span.holiday-local-name", { dir: "auto" }, holiday.localName),
+        holiday.localName !== holiday.name ? h("span.holiday-name", {}, `(${holiday.name})`) : null,
+      ].filter(Boolean)),
+      !holiday.isPublic ? h("p.holiday-types", {}, `Type: ${holiday.types.join(", ")}`) : null,
+      renderClassificationBadge(holiday.classification),
+      renderRegionNote(holiday),
+      h("button.shortlist-toggle", {
+        type: "button",
+        "aria-pressed": isShortlisted,
+        onclick: () => handlers.onToggleShortlist(holiday),
+      }, isShortlisted ? "✓ Shortlisted" : "Add to shortlist"),
     ].filter(Boolean)),
-    h("time.holiday-date", { datetime: holiday.date }, holiday.date),
-    !holiday.isPublic ? h("p.holiday-types", {}, `Type: ${holiday.types.join(", ")}`) : null,
-    renderClassificationBadge(holiday.classification),
-    renderRegionNote(holiday),
-    h("button.shortlist-toggle", {
-      type: "button",
-      "aria-pressed": isShortlisted,
-      onclick: () => handlers.onToggleShortlist(holiday),
-    }, isShortlisted ? "✓ Shortlisted" : "Add to shortlist"),
-  ].filter(Boolean));
+  ]);
 }
 
 function renderCountryPicker(state, handlers) {

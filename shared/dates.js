@@ -15,6 +15,21 @@ export const Classification = Object.freeze({
   MIDWEEK: "midweek",
 });
 
+export const WEEKDAY_NAMES = Object.freeze([
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+]);
+
+export const MONTH_ABBREVIATIONS = Object.freeze([
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+]);
+
 const MS_PER_DAY = 86400000;
 
 const WEEKDAY_RULES = {
@@ -70,6 +85,11 @@ export function classifyWeekday(weekday) {
 
 export function currentYear() {
   return new Date().getUTCFullYear();
+}
+
+export function formatDayTile(dateString) {
+  const { month, day } = parseISODate(dateString);
+  return { day: String(day).padStart(2, "0"), month: MONTH_ABBREVIATIONS[month - 1] };
 }
 
 function isAlreadyOff(dateString, holidaySet) {

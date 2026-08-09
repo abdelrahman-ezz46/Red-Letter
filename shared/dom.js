@@ -29,15 +29,18 @@ export function h(tag, attrs = {}, children = []) {
   }
 
   for (const [key, value] of Object.entries(attrs)) {
-    if (value === null || value === undefined || value === false) continue;
+    if (value === null || value === undefined) continue;
+
     if (key === "class") {
       element.classList.add(...value.split(" ").filter(Boolean));
     } else if (key.startsWith("on") && typeof value === "function") {
       element.addEventListener(key.slice(2).toLowerCase(), value);
     } else if (key === "dataset") {
       Object.assign(element.dataset, value);
-    } else if (value === true) {
-      element.setAttribute(key, "");
+    } else if (key.startsWith("aria-") || key === "role") {
+      element.setAttribute(key, String(value));
+    } else if (typeof value === "boolean") {
+      if (value) element.setAttribute(key, "");
     } else {
       element.setAttribute(key, String(value));
     }
