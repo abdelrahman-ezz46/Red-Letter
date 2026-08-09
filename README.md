@@ -2,7 +2,7 @@
 
 A long-weekend planner. Pick a country, see this year's public holidays, and the app works out which ones land next to a weekend and are worth booking leave around. Shortlist the ones you want and keep them — a small, persistent plan, not a lookup table.
 
-**Live app:** _to be added after deployment (Stage 10)_
+**Live app:** https://abdelrahman-ezz46.github.io/Red-Letter/
 
 ---
 
@@ -144,7 +144,7 @@ Then open `http://localhost:4321`.
 
 Fully static — no environment variables, no secrets, no server-side component required. Any static host works identically:
 
-- **GitHub Pages** — Settings → Pages → deploy from the `main` branch, root directory. No configuration beyond that.
+- **GitHub Pages** (used for the live link above) — Settings → Pages → deploy from the `main` branch, root directory. No build step, no configuration beyond that.
 - **Netlify / Vercel** — connect the repo; build command is empty, publish directory is the repo root.
 
 ## Known limitations
