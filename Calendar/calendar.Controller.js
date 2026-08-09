@@ -29,32 +29,59 @@ export function initCalendarSlice(root, store) {
   }
 
   function paint() {
-    renderCalendar(body, buildViewState(), handlers);
+    try {
+      renderCalendar(body, buildViewState(), handlers);
+    } catch (error) {
+      console.error("Calendar failed to render", error);
+    }
   }
 
   async function loadCountries() {
     store.setState({ countriesStatus: "loading", countriesError: null });
-    const result = await fetchAvailableCountries();
 
-    if (result.isSuccess) {
-      store.setState({ countries: mapCountries(result.data), countriesStatus: "success" });
-    } else if (result.error.code === ErrorCode.NO_RESULTS) {
-      store.setState({ countries: [], countriesStatus: "empty", countriesError: result.error });
-    } else {
-      store.setState({ countriesStatus: "error", countriesError: result.error });
+    try {
+      const result = await fetchAvailableCountries();
+
+      if (result.isSuccess) {
+        store.setState({ countries: mapCountries(result.data), countriesStatus: "success" });
+      } else if (result.error.code === ErrorCode.NO_RESULTS) {
+        store.setState({ countries: [], countriesStatus: "empty", countriesError: result.error });
+      } else {
+        store.setState({ countriesStatus: "error", countriesError: result.error });
+      }
+    } catch (error) {
+      console.error("Unexpected error loading countries", error);
+      store.setState({
+        countriesStatus: "error",
+        countriesError: { code: "UNEXPECTED", message: error.message, context: {} },
+      });
     }
   }
 
   async function loadHolidays(countryCode, year) {
     store.setState({ holidaysStatus: "loading", holidaysError: null });
-    const result = await fetchPublicHolidays(countryCode, year);
 
-    if (result.isSuccess) {
-      store.setState({ holidays: mapHolidays(result.data), holidaysStatus: "success", holidaysError: null });
-    } else if (result.error.code === ErrorCode.NO_RESULTS) {
-      store.setState({ holidays: [], holidaysStatus: "empty", holidaysError: result.error });
-    } else {
-      store.setState({ holidaysStatus: "error", holidaysError: result.error });
+    try {
+      const result = await fetchPublicHolidays(countryCode, year);
+
+      const current = store.getState();
+      if (current.selectedCountryCode !== countryCode || current.selectedYear !== year) {
+        return;
+      }
+
+      if (result.isSuccess) {
+        store.setState({ holidays: mapHolidays(result.data), holidaysStatus: "success", holidaysError: null });
+      } else if (result.error.code === ErrorCode.NO_RESULTS) {
+        store.setState({ holidays: [], holidaysStatus: "empty", holidaysError: result.error });
+      } else {
+        store.setState({ holidaysStatus: "error", holidaysError: result.error });
+      }
+    } catch (error) {
+      console.error("Unexpected error loading holidays", error);
+      store.setState({
+        holidaysStatus: "error",
+        holidaysError: { code: "UNEXPECTED", message: error.message, context: {} },
+      });
     }
   }
 

@@ -13,7 +13,11 @@ export function initShortlistSlice(root, store) {
   });
 
   function paint() {
-    renderShortlist(body, store.getState(), handlers);
+    try {
+      renderShortlist(body, store.getState(), handlers);
+    } catch (error) {
+      console.error("Shortlist failed to render", error);
+    }
   }
 
   const handlers = {

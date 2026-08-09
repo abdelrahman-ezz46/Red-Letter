@@ -62,7 +62,13 @@ export function h(tag, attrs = {}, children = []) {
     if (key === "class") {
       element.classList.add(...value.split(" ").filter(Boolean));
     } else if (key.startsWith("on") && typeof value === "function") {
-      element.addEventListener(key.slice(2).toLowerCase(), value);
+      element.addEventListener(key.slice(2).toLowerCase(), (event) => {
+        try {
+          value(event);
+        } catch (error) {
+          console.error(`Unhandled error in "${key}" handler`, error);
+        }
+      });
     } else if (key === "dataset") {
       Object.assign(element.dataset, value);
     } else if (key.startsWith("aria-") || key === "role") {

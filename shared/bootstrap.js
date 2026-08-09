@@ -23,25 +23,29 @@ function resolveMounts() {
   return { mounts, missing };
 }
 
-function reportBootFailure(missing) {
+function reportBootFailure(reason) {
   document.documentElement.dataset.appReady = "false";
-  const message = `Red Letter could not start: missing mount ${missing.join(", ")}`;
-  console.error(message);
+  console.error(`Red Letter could not start: ${reason}`);
 }
 
 export function boot() {
   const { mounts, missing } = resolveMounts();
 
   if (missing.length > 0) {
-    reportBootFailure(missing);
+    reportBootFailure(`missing mount ${missing.join(", ")}`);
     return null;
   }
 
-  const store = createStore({ shortlist: [] });
+  try {
+    const store = createStore({ shortlist: [] });
 
-  initShortlistSlice(mounts.shortlist, store);
-  initCalendarSlice(mounts.calendar, store);
+    initShortlistSlice(mounts.shortlist, store);
+    initCalendarSlice(mounts.calendar, store);
 
-  document.documentElement.dataset.appReady = "true";
-  return { mounts, store };
+    document.documentElement.dataset.appReady = "true";
+    return { mounts, store };
+  } catch (error) {
+    reportBootFailure(`unexpected error during startup (${error.message})`);
+    return null;
+  }
 }
