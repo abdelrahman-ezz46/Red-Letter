@@ -1,4 +1,4 @@
-import { currentYear } from "../shared/dates.js";
+import { currentYear, isPastDate } from "../shared/dates.js";
 import { ErrorCode } from "../shared/result.js";
 import { h } from "../shared/dom.js";
 import { fetchAvailableCountries, fetchPublicHolidays } from "./calendar.Service.js";
@@ -119,6 +119,8 @@ export function initCalendarSlice(root, store) {
         store.setState({ shortlist: shortlist.filter((item) => item.key !== key) });
         return;
       }
+
+      if (isPastDate(holiday.date)) return;
 
       store.setState({
         shortlist: [

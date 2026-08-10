@@ -540,6 +540,20 @@ body {
   color: var(--surface);
 }
 
+.shortlist-toggle:disabled {
+  border-color: var(--line);
+  color: var(--ink-faint);
+  cursor: not-allowed;
+}
+
+.shortlist-toggle:disabled:hover {
+  background: none;
+}
+
+.holiday-card[data-past="true"] {
+  opacity: 0.72;
+}
+
 .status-loading,
 .status-empty {
   color: var(--ink-muted);

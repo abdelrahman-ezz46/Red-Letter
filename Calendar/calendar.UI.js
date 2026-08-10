@@ -1,7 +1,7 @@
 import { h, render } from "../shared/dom.js";
 import { messageForError } from "../shared/errorMessages.js";
 import { CLASSIFICATION_LABELS } from "../shared/classificationLabels.js";
-import { WEEKDAY_NAMES, formatDayTile } from "../shared/dates.js";
+import { WEEKDAY_NAMES, formatDayTile, isPastDate, todayISO } from "../shared/dates.js";
 
 function formatDateRange(startDate, endDate) {
   return startDate === endDate ? startDate : `${startDate} → ${endDate}`;
@@ -38,8 +38,25 @@ function renderRegionNote(holiday) {
   return h("p.holiday-regions", {}, `Not marked nationwide by the source — regions: ${regionList}`);
 }
 
-function renderHolidayCard(holiday, isShortlisted, handlers) {
-  return h("li.holiday-card", { dataset: { classification: holiday.classification?.classification ?? "none" } }, [
+function renderShortlistToggle(holiday, isShortlisted, isPast, handlers) {
+  const blocked = isPast && !isShortlisted;
+
+  return h("button.shortlist-toggle", {
+    type: "button",
+    "aria-pressed": isShortlisted,
+    disabled: blocked,
+    title: blocked ? "This date has already passed" : null,
+    onclick: () => handlers.onToggleShortlist(holiday),
+  }, blocked ? "Date has passed" : isShortlisted ? "✓ Shortlisted" : "Add to shortlist");
+}
+
+function renderHolidayCard(holiday, isShortlisted, isPast, handlers) {
+  return h("li.holiday-card", {
+    dataset: {
+      classification: holiday.classification?.classification ?? "none",
+      past: String(isPast),
+    },
+  }, [
     renderDayTile(holiday.date, holiday.weekday),
     h("div.holiday-body", {}, [
       h("div.holiday-heading", {}, [
@@ -49,11 +66,7 @@ function renderHolidayCard(holiday, isShortlisted, handlers) {
       !holiday.isPublic ? h("p.holiday-types", {}, `Type: ${holiday.types.join(", ")}`) : null,
       renderClassificationBadge(holiday.classification),
       renderRegionNote(holiday),
-      h("button.shortlist-toggle", {
-        type: "button",
-        "aria-pressed": isShortlisted,
-        onclick: () => handlers.onToggleShortlist(holiday),
-      }, isShortlisted ? "✓ Shortlisted" : "Add to shortlist"),
+      renderShortlistToggle(holiday, isShortlisted, isPast, handlers),
     ].filter(Boolean)),
   ]);
 }
@@ -132,10 +145,12 @@ function renderHolidaysSection(state, handlers) {
 
   if (state.holidaysStatus === "success") {
     const shortlistKeys = new Set(state.shortlist.map((item) => item.key));
+    const today = todayISO();
     return h("ul.holiday-list", {}, state.holidays.map((holiday) =>
       renderHolidayCard(
         holiday,
         shortlistKeys.has(`${state.selectedCountryCode}:${holiday.date}`),
+        isPastDate(holiday.date, today),
         handlers,
       ),
     ));

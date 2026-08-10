@@ -87,6 +87,14 @@ export function currentYear() {
   return new Date().getUTCFullYear();
 }
 
+export function todayISO() {
+  return timestampToISODate(Date.now());
+}
+
+export function isPastDate(dateString, referenceDate = todayISO()) {
+  return compareISODates(dateString, referenceDate) < 0;
+}
+
 export function formatDayTile(dateString) {
   const { month, day } = parseISODate(dateString);
   return { day: String(day).padStart(2, "0"), month: MONTH_ABBREVIATIONS[month - 1] };
