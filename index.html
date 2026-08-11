@@ -8,7 +8,11 @@
       name="description"
       content="Pick a country, see this year's public holidays, and find the ones worth booking time off around."
     />
+    <!-- Render-blocking by design: the page never paints unstyled. -->
     <link rel="stylesheet" href="style.css" />
+    <!-- An inline SVG favicon, so there is no second network request and no
+         extra file to deploy. The %22 are escaped quotes and %F0%9F%93%85 is
+         the 📅 emoji — a raw quote would end the attribute early. -->
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2213%22 font-size=%2213%22>%F0%9F%93%85</text></svg>"
@@ -25,6 +29,15 @@
       </header>
 
       <main class="site-main">
+        <!-- The two mount points. Their ids are the contract with
+             shared/bootstrap.js, which looks them up by name.
+
+             Each <h2> lives here in the HTML rather than being rendered by
+             JavaScript: the controllers append a .slice-body BELOW the heading
+             and only ever rebuild that, so the heading is never destroyed.
+
+             aria-labelledby ties each section to its own heading, so a screen
+             reader announces "Holidays, region" instead of just "region". -->
         <section
           id="calendar-root"
           class="slice slice-calendar"
@@ -45,6 +58,8 @@
       <footer class="site-footer">
         <p>
           Holiday data from
+          <!-- rel="noopener noreferrer" stops the opened tab getting a
+               window.opener handle back to this page. -->
           <a href="https://date.nager.at" rel="noopener noreferrer" target="_blank"
             >Nager.Date</a
           >.
@@ -52,6 +67,10 @@
       </footer>
     </div>
 
+    <!-- type="module" gives three things: it defers automatically (so the two
+         sections above always exist by the time boot() runs), it enables
+         import/export, and it is strict mode. It is also why the app must be
+         served over http:// rather than opened as a file:// URL. -->
     <script type="module" src="main.js"></script>
   </body>
 </html>

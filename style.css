@@ -1,9 +1,17 @@
+/* ==========================================================================
+   1. RESET — flatten the browser's defaults so every value below is a
+      deliberate choice rather than an inherited one.
+   ========================================================================== */
+
+/* Padding and borders count inside a declared width, not on top of it. */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
+/* Every gap in this app comes from flex/grid `gap`, never from margins —
+   which means margin collapsing can never surprise us. */
 * {
   margin: 0;
 }
@@ -27,6 +35,8 @@ svg {
   max-width: 100%;
 }
 
+/* Form controls don't inherit font or colour by default. This one rule is
+   what makes every button in the app match the body text. */
 input,
 button,
 select {
@@ -58,13 +68,22 @@ p {
   text-wrap: pretty;
 }
 
+/* The app's accessibility floor. :focus-visible (not :focus) means keyboard
+   users get a clear ring while mouse users don't get one on every click. */
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
 
+/* ==========================================================================
+   2. DESIGN TOKENS — every value the rest of the file uses. Nothing below
+      hardcodes a colour or a spacing number.
+   ========================================================================== */
+
 :root {
+  /* System font stacks only: no web font, so no extra request and no flash
+     of unstyled text. */
   --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: ui-serif, Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
@@ -74,6 +93,8 @@ p {
   --text-base: 1rem;
   --text-md: 1.1rem;
   --text-lg: 1.35rem;
+  /* clamp() scales these fluidly with the viewport between a floor and a
+     ceiling, so the headings need no breakpoint of their own. */
   --text-xl: clamp(1.6rem, 3vw, 2rem);
   --text-2xl: clamp(2.2rem, 6vw, 3.25rem);
 
@@ -106,6 +127,8 @@ p {
   --accent: #a8332a;
   --accent-soft: #f6e7e4;
 
+  /* One colour pair per classification. These names match the strings in
+     shared/dates.js exactly — the CSS and the logic share a vocabulary. */
   --free: #1f6f4a;
   --free-soft: #e2f0e8;
   --bridge: #a8621b;
@@ -116,6 +139,10 @@ p {
   --absorbed-soft: #eeebe5;
 }
 
+/* Dark mode redeclares ONLY the colour tokens. Every rule below inherits the
+   change automatically — there is not one dark-mode override anywhere else in
+   this file. Note the accent lightens: the light-mode red would fail contrast
+   on a dark background. */
 @media (prefers-color-scheme: dark) {
   :root {
     --ink: #efece5;
@@ -185,6 +212,11 @@ body {
   gap: var(--space-xl);
 }
 
+/* Mobile-first: one column above, two columns from 64rem (1024px) up.
+   minmax(0, ...) on both tracks is the fix for grid children refusing to
+   shrink below their content width — without it a long holiday name would
+   push its column wider than the page. align-items: start stops the shorter
+   column stretching to match the taller one. */
 @media (min-width: 64rem) {
   .site-main {
     display: grid;
@@ -269,6 +301,8 @@ body {
   color: var(--ink-faint);
 }
 
+/* max-height + overflow-y makes the results a self-contained scroll area,
+   so 40 matches never push the rest of the page down. */
 .country-results {
   list-style: none;
   padding: 0;
@@ -299,6 +333,9 @@ body {
   background-color: var(--accent-soft);
 }
 
+/* Styled straight off the ARIA attribute rather than a separate .selected
+   class, so what you SEE and what a screen reader ANNOUNCES can never drift
+   apart — there is only one source of truth. */
 .country-option[aria-pressed="true"] {
   font-weight: 600;
   background-color: var(--accent-soft);
@@ -367,6 +404,9 @@ body {
   box-shadow: var(--shadow-md);
 }
 
+/* flex: 0 0 auto — the date square never grows or shrinks, whatever the
+   holiday name does. The 3px top border is the colour signal, recoloured by
+   the [data-classification] rules below. */
 .day-tile {
   flex: 0 0 auto;
   width: 3.4rem;
@@ -404,6 +444,11 @@ body {
   color: var(--ink-faint);
 }
 
+/* THE COLOUR SYSTEM'S PAYOFF.
+   The JavaScript sets data-classification="free" (or bridge / midweek / none)
+   on each card and never touches a colour. These rules turn that one attribute
+   into the whole visual language. "absorbed" needs no rule — it is the default
+   set on .day-tile above. */
 .holiday-card[data-classification="free"] .day-tile,
 .shortlist-item[data-classification="free"] .day-tile {
   border-top-color: var(--free);
@@ -434,6 +479,8 @@ body {
   color: var(--midweek);
 }
 
+/* min-width: 0 is the essential partner to the grid's minmax(0, ...) above:
+   it lets a long holiday name wrap instead of overflowing its card. */
 .holiday-body {
   flex: 1 1 auto;
   min-width: 0;
@@ -512,6 +559,8 @@ body {
   border-left-color: var(--midweek);
 }
 
+/* Visually present, but deliberately carrying none of the four meanings —
+   this is a day the app is NOT making a claim about. */
 .badge-none {
   background-color: var(--absorbed-soft);
   color: var(--ink-faint);
@@ -535,6 +584,8 @@ body {
   background-color: var(--accent-soft);
 }
 
+/* Shortlisted: the outlined button inverts to a filled one. Driven off ARIA
+   again, for the same reason as the country option above. */
 .shortlist-toggle[aria-pressed="true"] {
   background-color: var(--accent);
   color: var(--surface);
@@ -550,16 +601,21 @@ body {
   background: none;
 }
 
+/* Past holidays stay visible and readable — just de-emphasised. */
 .holiday-card[data-past="true"] {
   opacity: 0.72;
 }
 
+/* "Loading" and "nothing here" share one calm, muted style. This is where the
+   README's claim that NO_RESULTS is not an error becomes visually true: an
+   empty answer looks like information, not like a failure. */
 .status-loading,
 .status-empty {
   color: var(--ink-muted);
   font-size: var(--text-sm);
 }
 
+/* The only alarming style in the app, reserved for genuine failures. */
 .status-error {
   color: var(--accent);
   font-size: var(--text-sm);
@@ -599,6 +655,8 @@ body {
   border-radius: var(--radius-md);
 }
 
+/* Deliberately quieter than the add button: removing something should not
+   compete for attention with adding it. */
 .shortlist-remove {
   align-self: flex-start;
   margin-top: var(--space-2xs);
